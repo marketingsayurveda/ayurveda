@@ -17,6 +17,8 @@
   --footer-heading: #8A8A83;
   --note-bg: #BCE6C3;
   --note-ink: #173A20;
+  --error: #D64545;
+  --error-bg: #F7DCDC;
   --font-heading: "Bitter", serif;
   --font-body: "Nunito Sans", sans-serif;
   /* Pencil: page 1440 – 100px side padding => 1240 content shell */
@@ -823,6 +825,57 @@ main {
   border-radius: 3px;
   padding: 13px;
   font-size: 1.5rem;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.field__error {
+  display: none;
+  color: var(--error);
+  font-size: 0.85rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.field__error.is-visible {
+  display: block;
+}
+
+.field input.is-invalid,
+.field textarea.is-invalid {
+  border-color: var(--error);
+}
+
+.field input.is-invalid:focus,
+.field textarea.is-invalid:focus {
+  outline-color: var(--error);
+}
+
+.form-status {
+  display: none;
+  margin: 0;
+  padding: 9px 16px;
+  border-radius: 1rem;
+  font-weight: 700;
+  font-size: 1rem;
+  line-height: 1.35;
+}
+
+.form-status.is-visible {
+  display: block;
+}
+
+.form-status--success {
+  background: var(--note-bg);
+  color: var(--note-ink);
+}
+
+.form-status--error {
+  background: var(--error-bg);
+  color: var(--error);
 }
 
 /* Footer */
