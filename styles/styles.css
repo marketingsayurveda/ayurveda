@@ -34,6 +34,7 @@
 
 html {
   scroll-padding-top: calc(var(--navbar-height) + 16px);
+  scroll-behavior: smooth;
 }
 
 html, body {
