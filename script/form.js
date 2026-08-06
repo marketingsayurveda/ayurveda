@@ -1,9 +1,13 @@
-// La configuración vive en script/config.js, ignorado por git.
-// Si falta, copia script/config.example.js a script/config.js.
-const CONFIG = window.APP_CONFIG || {};
-const WEB3FORMS_ACCESS_KEY = CONFIG.WEB3FORMS_ACCESS_KEY || "";
-const WEB3FORMS_ENDPOINT =
-  CONFIG.WEB3FORMS_ENDPOINT || "https://api.web3forms.com/submit";
+// Configuración del formulario.
+//
+// El envío usa Netlify Forms: no hay endpoint externo ni credenciales.
+// Netlify detecta el formulario al desplegar (por data-netlify="true" en el
+// marcado) y guarda los envíos; el correo de aviso a info@ayurvedskepobyty.sk
+// se configura en el panel de Netlify (Forms > Form notifications), no aquí.
+//
+// Ojo: esto solo funciona en el sitio desplegado en Netlify. En local o en
+// otro hosting el POST devuelve 404 y verás el mensaje de error.
+const FORM_NAME = "contact";
 
 const MESSAGES = {
   nameRequired: "Zadajte vaše meno a priezvisko.",
@@ -122,41 +126,25 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    if (!WEB3FORMS_ACCESS_KEY || WEB3FORMS_ACCESS_KEY === "TU_ACCESS_KEY_AQUI") {
-      console.error(
-        "form.js: falta configurar WEB3FORMS_ACCESS_KEY en script/config.js (plantilla: script/config.example.js). Crea la clave en https://web3forms.com con info@ayurvedskepobyty.sk."
-      );
-      setStatus(MESSAGES.error, "error");
-      pushEvent({ event: "form_submit_error", form_name: "contact", error_type: "api" });
-      return;
-    }
-
     const retreatType = form.querySelector("[name='type']").value;
 
-    pushEvent({ event: "form_submit_attempt", form_name: "contact" });
+    pushEvent({ event: "form_submit_attempt", form_name: FORM_NAME });
     setLoading(true);
 
-    const payload = {
-      ...Object.fromEntries(new FormData(form)),
-      access_key: WEB3FORMS_ACCESS_KEY,
-      subject: "Nová žiadosť o rezerváciu — ayurvedskepobyty.sk",
-      from_name: "Ayurvédske pobyty — web",
-    };
+    // Netlify espera el POST urlencoded contra una ruta del propio sitio,
+    // con form-name identificando el formulario (va en un input oculto).
+    const body = new URLSearchParams(new FormData(form)).toString();
 
     try {
-      const response = await fetch(WEB3FORMS_ENDPOINT, {
+      const response = await fetch(window.location.pathname, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        body: JSON.stringify(payload),
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body,
       });
-      const data = await response.json();
 
-      if (!data.success) {
+      if (!response.ok) {
         setStatus(MESSAGES.error, "error");
-        pushEvent({ event: "form_submit_error", form_name: "contact", error_type: "api" });
+        pushEvent({ event: "form_submit_error", form_name: FORM_NAME, error_type: "api" });
         return;
       }
 
@@ -165,12 +153,12 @@ document.addEventListener("DOMContentLoaded", () => {
       setStatus(MESSAGES.success, "success");
       pushEvent({
         event: "form_submit_success",
-        form_name: "contact",
+        form_name: FORM_NAME,
         retreat_type: retreatType,
       });
     } catch (error) {
       setStatus(MESSAGES.error, "error");
-      pushEvent({ event: "form_submit_error", form_name: "contact", error_type: "network" });
+      pushEvent({ event: "form_submit_error", form_name: FORM_NAME, error_type: "network" });
     } finally {
       setLoading(false);
     }

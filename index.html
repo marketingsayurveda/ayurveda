@@ -585,7 +585,16 @@
             </p>
           </div>
 
-          <form class="contact-form" id="contact-form" novalidate>
+          <form
+            class="contact-form"
+            id="contact-form"
+            name="contact"
+            method="POST"
+            data-netlify="true"
+            data-netlify-honeypot="bot-field"
+            novalidate
+          >
+            <input type="hidden" name="form-name" value="contact" />
             <div class="field">
               <label for="name">Meno a priezvisko</label>
               <input
@@ -636,13 +645,12 @@
               ></textarea>
               <span class="field__error" id="message-error" role="alert"></span>
             </div>
-            <input
-              type="checkbox"
-              name="botcheck"
-              style="display: none"
-              tabindex="-1"
-              autocomplete="off"
-            />
+            <p style="display: none">
+              <label>
+                Nevypĺňajte toto pole:
+                <input name="bot-field" tabindex="-1" autocomplete="off" />
+              </label>
+            </p>
             <button type="submit" class="btn btn--dark submit-button">
               Odoslať správu
             </button>
@@ -688,7 +696,6 @@
 
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     <script src="script/index.js"></script>
-    <script src="script/config.js"></script>
     <script src="script/form.js"></script>
   </body>
 </html>
