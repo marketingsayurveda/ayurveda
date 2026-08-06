@@ -375,6 +375,7 @@ main {
 }
 
 .retreat-card {
+  position: relative;
   width: 360px;
   border-radius: 10px;
   display: flex;
@@ -486,6 +487,49 @@ main {
   width: 20px;
   height: 20px;
   flex-shrink: 0;
+  transition: transform 0.3s ease;
+}
+
+.retreat-card__more.is-open i,
+.retreat-card__more.is-open svg {
+  transform: rotate(180deg);
+}
+
+.retreat-card__toogle {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 5;
+  overflow: hidden;
+  max-height: 0;
+  opacity: 0;
+  transform: translateY(-12px);
+  background: var(--white);
+  border-radius: 1rem;
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.15);
+  padding: 0 2rem;
+  pointer-events: none;
+  transition: max-height 0.45s ease, opacity 0.35s ease, transform 0.35s ease,
+    padding 0.35s ease;
+  margin-top: 1rem;
+  border: 15px solid var(--green);
+}
+
+.retreat-card__toogle.is-open {
+  max-height: 600px;
+  opacity: 1;
+  transform: translateY(0);
+  padding: 1.25rem 2rem 1.5rem;
+  pointer-events: auto;
+}
+
+.retreat-card__toogle span {
+  display: block;
+  text-align: left;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--ink);
 }
 
 .all-retreats-link {
