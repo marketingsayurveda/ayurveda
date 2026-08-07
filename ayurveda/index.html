@@ -629,7 +629,7 @@
             </div>
             <div class="field">
               <label for="type">O aký druh pobytu máte záujem?</label>
-              <select id="type" name="type">
+              <select id="type" name="type" class="field__select">
                 <option>Individuálny</option>
                 <option>Skupinový</option>
                 <option>Ešte neviem</option>
@@ -651,8 +651,12 @@
                 <input name="bot-field" tabindex="-1" autocomplete="off" />
               </label>
             </p>
-            <button type="submit" class="btn btn--dark submit-button">
-              Odoslať správu
+            <button
+              type="submit"
+              class="btn btn--dark submit-button"
+            >
+              <span class="submit-button__spinner" aria-hidden="true"></span>
+              <span class="submit-button__label">Odoslať správu</span>
             </button>
             <p class="form-status" id="form-status" role="status" aria-live="polite"></p>
           </form>
