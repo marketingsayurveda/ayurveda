@@ -9,6 +9,12 @@
 // otro hosting el POST devuelve 404 y verás el mensaje de error.
 const FORM_NAME = "contact";
 
+// Página de agradecimiento a la que se redirige tras un envío correcto.
+const THANKS_URL = "/ayurveda/thanks.html";
+
+// Margen antes de redirigir para que GTM alcance a enviar el evento de éxito.
+const REDIRECT_DELAY = 400;
+
 const MESSAGES = {
   nameRequired: "Zadajte vaše meno a priezvisko.",
   nameShort: "Meno musí mať aspoň 2 znaky.",
@@ -17,7 +23,6 @@ const MESSAGES = {
   phoneInvalid: "Zadajte platné telefónne číslo.",
   messageLong: "Správa je príliš dlhá (max. 2000 znakov).",
   sending: "Odosielam…",
-  success: "Ďakujeme! Vašu správu sme prijali a ozveme sa vám do 24 hodín.",
   error:
     "Správu sa nepodarilo odoslať. Skúste to znova alebo nám napíšte na info@ayurvedskepobyty.sk.",
 };
@@ -61,7 +66,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const status = form.querySelector("#form-status");
   const submitButton = form.querySelector(".submit-button");
-  const submitLabel = submitButton.textContent.trim();
+  const submitLabel = submitButton.querySelector(".submit-button__label");
+  const submitLabelText = submitLabel.textContent.trim();
   const fields = ["name", "email", "phone", "message"]
     .map((name) => form.querySelector(`[name="${name}"]`))
     .filter(Boolean);
@@ -90,10 +96,18 @@ document.addEventListener("DOMContentLoaded", () => {
     status.classList.toggle("is-visible", Boolean(message));
   };
 
+  // Mientras se envía, el botón queda deshabilitado y muestra el spinner para
+  // que no se pueda volver a pulsar hasta que haya respuesta.
   const setLoading = (isLoading) => {
     submitButton.disabled = isLoading;
-    submitButton.textContent = isLoading ? MESSAGES.sending : submitLabel;
+    submitButton.classList.toggle("is-loading", isLoading);
+    submitButton.setAttribute("aria-busy", String(isLoading));
+    submitLabel.textContent = isLoading ? MESSAGES.sending : submitLabelText;
   };
+
+  // Al volver atrás desde la página de agradecimiento el navegador puede
+  // restaurar esta página desde bfcache con el botón todavía bloqueado.
+  window.addEventListener("pageshow", () => setLoading(false));
 
   // Revalidación progresiva: solo se actualiza el error de un campo que ya
   // estaba marcado como inválido, para no molestar mientras se escribe.
@@ -135,6 +149,8 @@ document.addEventListener("DOMContentLoaded", () => {
     // con form-name identificando el formulario (va en un input oculto).
     const body = new URLSearchParams(new FormData(form)).toString();
 
+    let isRedirecting = false;
+
     try {
       const response = await fetch(window.location.pathname, {
         method: "POST",
@@ -148,19 +164,25 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
-      form.reset();
       clearErrors();
-      setStatus(MESSAGES.success, "success");
       pushEvent({
         event: "form_submit_success",
         form_name: FORM_NAME,
         retreat_type: retreatType,
       });
+
+      // El botón sigue en loading hasta que el navegador cambie de página.
+      isRedirecting = true;
+      window.setTimeout(() => {
+        window.location.assign(THANKS_URL);
+      }, REDIRECT_DELAY);
     } catch (error) {
       setStatus(MESSAGES.error, "error");
       pushEvent({ event: "form_submit_error", form_name: FORM_NAME, error_type: "network" });
     } finally {
-      setLoading(false);
+      if (!isRedirecting) {
+        setLoading(false);
+      }
     }
   });
 });
