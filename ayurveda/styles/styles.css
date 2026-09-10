@@ -375,15 +375,17 @@ main {
 }
 
 .retreat-grid {
-  min-width: 70%;
+  width: 100%;
   display: flex;
-  justify-content: space-between;
+  flex-wrap: wrap;
+  justify-content: center;
   gap: 34px;
 }
 
 .retreat-card {
   position: relative;
   width: 360px;
+  max-width: 100%;
   border-radius: 10px;
   display: flex;
   flex-direction: column;
@@ -440,7 +442,7 @@ main {
   font-family: var(--font-heading);
   font-weight: 900;
   font-size: 1.5rem;
-  line-height: 22px;
+  line-height: 1.25;
   color: var(--ink);
   margin-top: .5rem;
 }
@@ -524,7 +526,7 @@ main {
 }
 
 .retreat-card__toogle.is-open {
-  max-height: 600px;
+  max-height: 900px;
   opacity: 1;
   transform: translateY(0);
   padding: 1.25rem 2rem 1.5rem;
